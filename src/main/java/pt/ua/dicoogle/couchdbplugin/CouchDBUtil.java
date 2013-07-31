@@ -22,7 +22,9 @@ import pt.ua.dicoogle.sdk.datastructs.SearchResult;
  */
 public class CouchDBUtil {
 
-   public static List<SearchResult> getListFromViewResult(ViewResult vResult, URI location, float f) {
+    private static String regEx = ".";
+    
+    public static List<SearchResult> getListFromViewResult(ViewResult vResult, URI location, float f) {
         List<ViewResult.Row> listResult = vResult.getRows();
         List<SearchResult> result = new ArrayList<SearchResult>();
         for (ViewResult.Row r : listResult) {
@@ -38,7 +40,7 @@ public class CouchDBUtil {
         }
         return result;
     }
-    
+
     private static HashMap<String, Object> getMapFromJsonNode(JsonNode node) {
         HashMap<String, Object> map = new HashMap<String, Object>();
         Iterator<Map.Entry<String, JsonNode>> fieldsIt = node.getFields();
@@ -46,7 +48,7 @@ public class CouchDBUtil {
             Map.Entry<String, JsonNode> entry = fieldsIt.next();
             JsonNode fieldNode = entry.getValue();
             String fieldName = entry.getKey();
-            if(fieldNode.getFieldNames().hasNext()){
+            if (fieldNode.getFieldNames().hasNext()) {
                 map.putAll(getMapFromJsonNode(fieldNode));
                 continue;
             }
@@ -249,7 +251,7 @@ public class CouchDBUtil {
                 query = madeQueryOR(query, decodeStringToQuery(str));
             }
         }
-        return "function(doc) { if" + query + " emit(null, doc) }";
+        return "function(doc) { var regex = /"+regEx.replaceAll("/", "\\/")+"/i; if" + query + " emit(null, doc) }";
     }
 
     private static String madeQueryFindAll() {
@@ -282,11 +284,18 @@ public class CouchDBUtil {
          query.put(str, new BasicDBObject("$ne", strValue));
          }
          return query;*/
+        String strValue = (String) value;
+        if (strValue.endsWith(".*")) {
+            strValue = strValue.substring(0, strValue.length() - 1);
+        } else if (strValue.endsWith("*")) {
+            strValue = strValue.substring(0, strValue.length() - 1);
+        }
+        regEx = "^"+strValue;
         String query;
         if (isNot) {
-            query = "(doc." + field + " != '" + value + "')";
+            query = "(!regex.test(doc."+field+"))";
         } else {
-            query = "(doc." + field + " == '" + value + "')";
+            query = "(regex.test(doc."+field+"))";
         }
         return query;
     }
