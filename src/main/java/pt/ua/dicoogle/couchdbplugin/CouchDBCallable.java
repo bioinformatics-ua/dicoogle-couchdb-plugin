@@ -13,6 +13,7 @@ import java.util.Iterator;
 import java.util.concurrent.Callable;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.apache.commons.io.IOUtils;
 import org.dcm4che2.data.DicomElement;
 import org.dcm4che2.data.DicomObject;
 import org.dcm4che2.data.Tag;
@@ -48,19 +49,16 @@ class CouchDBCallable implements Callable<Report> {
             String SOPInstanceUID;
             long start, end;
             start = System.currentTimeMillis();
-            InputStream is = stream.getInputStream();
             try {
-                DicomInputStream dis = new DicomInputStream(is);
+                DicomInputStream dis = new DicomInputStream(stream.getInputStream());
                 DicomObject dicomObj = dis.readDicomObject();
-                is.close();
+                dis.close();
 
                 SOPInstanceUID = dicomObj.get(Tag.SOPInstanceUID).getValueAsString(dicomObj.getSpecificCharacterSet(), 0);
-                HashMap<String, Object> map = retrieveHeader(dicomObj);
-                map.put("_id", SOPInstanceUID);
                 if (!db.contains(SOPInstanceUID)) {
+                    HashMap<String, Object> map = retrieveHeader(dicomObj);
+                    map.put("_id", SOPInstanceUID);
                     db.create(map);
-                } else {
-                    db.update(map);
                 }
 
                 System.out.println("Indexed from " + stream.getURI());

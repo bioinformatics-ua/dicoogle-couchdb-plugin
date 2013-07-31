@@ -26,7 +26,6 @@ public class CouchDBPluginSetTest {
     
     private static CouchDBPluginSet plugin;
     private static String dcmToTestPath = "D:\\DICOM_data\\datasetDCM\\Cardiac\\IM-0001-0031.dcm435509b7-1130-4f72-9c72-9ad60ae4c34e.dcm";
-    private static String QUERY = "";
     //private static String SOPInstanceUID = "1.3.12.2.1107.5.6.1.123.6.0.59545429011895";
     private static String SOPInstanceUID = "1.3.12.2.1107.5.6.1.123.6.0.5";
     
@@ -73,8 +72,8 @@ public class CouchDBPluginSetTest {
                 task.run();
                 // Test query
                 if(!plugin.getQueryPlugins().isEmpty()){
-                    //QUERY = "BitsStored:11";
-                    QUERY = "SOPInstanceUID:"+SOPInstanceUID;
+                    //String QUERY = "BitsStored:11";
+                    String QUERY = "SOPInstanceUID:"+SOPInstanceUID;
                     List<SearchResult> listResult = (List<SearchResult>) plugin.getQueryPlugins().get(0).query(QUERY);
                     System.out.println("Nb result : " + listResult.size());
                 }

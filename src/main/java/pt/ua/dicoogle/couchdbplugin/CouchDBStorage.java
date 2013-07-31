@@ -12,6 +12,7 @@ import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.apache.commons.io.IOUtils;
 import org.dcm4che2.data.DicomObject;
 import org.dcm4che2.data.Tag;
 import org.dcm4che2.io.DicomInputStream;
@@ -66,9 +67,7 @@ public class CouchDBStorage implements StorageInterface {
         }
         ArrayList<StorageInputStream> list = new ArrayList<StorageInputStream>();
         CouchDBStorageInputStream couchDBStorageIn = new CouchDBStorageInputStream(pUri);
-        if (couchDBStorageIn.getInputStream() != null) {
-            list.add(couchDBStorageIn);
-        }
+        list.add(couchDBStorageIn);
         return list;
     }
 
@@ -100,6 +99,7 @@ public class CouchDBStorage implements StorageInterface {
             }
             AttachmentInputStream attIn = new AttachmentInputStream(doc.getId() + ".dcm", is, "binary/dicom");
             db.createAttachment(doc.getId(), doc.getRevision(), attIn);
+            attIn.close();
         } catch (IOException ex) {
             Logger.getLogger(CouchDBStorage.class.getName()).log(Level.SEVERE, null, ex);
         }
