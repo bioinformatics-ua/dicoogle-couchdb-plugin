@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Config>
+<DefaultServerHost>localhost</DefaultServerHost>
+<DefaultServerPort>5984</DefaultServerPort>
+<StorageDataBase>storage_database_test</StorageDataBase>
+<IndexDataBase>index_database_test</IndexDataBase>
+</Config>
